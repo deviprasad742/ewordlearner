@@ -37,6 +37,9 @@ public class Word {
 	}
 
 	public String getDefinition() {
+		if (definition == null) {
+			definition = "";
+		}
 		return definition;
 	}
 
@@ -79,6 +82,10 @@ public class Word {
 	@Override
 	public String toString() {
 		return "Word [id=" + id + ", imageUrl=" + imageUrl + ", definition=" + definition + ", siteUrl=" + siteUrl + ", level=" + level + "]";
+	}
+
+	public boolean isLocal() {
+		return getSiteUrl() == null;
 	}
 
 	

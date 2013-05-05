@@ -99,13 +99,14 @@ public class WordView extends ViewPart {
 		prevButton.setToolTipText("Previous (Key Left)");
 		GridDataFactory.swtDefaults().applyTo(prevButton);
 		prevButton.addSelectionListener(getButtonListener(true));
+		prevButton.setEnabled(false);
+
 
 		nextButton = new Button(btnComposite, SWT.PUSH);
 		nextButton.setText(">");
 		nextButton.setToolTipText("Next (Key Right)");
 		GridDataFactory.swtDefaults().applyTo(nextButton);
 		nextButton.addSelectionListener(getButtonListener(false));
-		nextButton.setEnabled(false);
 		
 		fetchNewButton = new Button(btnComposite, SWT.PUSH);
 		fetchNewButton.setText(">*");
@@ -246,7 +247,7 @@ public class WordView extends ViewPart {
 		
 		Composite rightBtnComposite = new Composite(btnComposite, SWT.NONE);
 		GridDataFactory.swtDefaults().align(SWT.RIGHT, SWT.CENTER).grab(true, false).applyTo(rightBtnComposite);
-		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(rightBtnComposite);
+		GridLayoutFactory.fillDefaults().numColumns(5).applyTo(rightBtnComposite);
 		
 		
 		Composite wordComposite = new Composite(parent, SWT.NONE);
@@ -359,13 +360,34 @@ public class WordView extends ViewPart {
 		updateSearchProposals();
 		addWordButton = creaeteRightToolButton(rightBtnComposite);
 		addWordButton.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ADD));
-		addWordButton.setToolTipText("Add word");
+		addWordButton.setToolTipText("Add Word");
 		addWordButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				addWord(searchWordText.getText());
 			}
 		});
+		
+		removeWordButton = creaeteRightToolButton(rightBtnComposite);
+		removeWordButton.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ETOOL_DELETE));
+		removeWordButton.setToolTipText("Remove Word");
+		removeWordButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				removeWord();
+			}
+
+			private void removeWord() {
+				String message = "Are you sure you want to remove '" + currentWord.getId() + "'?";
+				boolean confirm = MessageDialog.openConfirm(getSite().getShell(), "Confirm", message);
+				if (confirm) {
+					currentWord = feedProvider.removeAndNavigateWord(currentWord);
+					updateUIAndImage();
+					updateSearchProposals();
+				}
+			}
+		});
+		removeWordButton.setEnabled(false);
 		
 		Button saveButton = creaeteRightToolButton(rightBtnComposite);
 		saveButton.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ETOOL_SAVE_EDIT));
@@ -489,6 +511,7 @@ public class WordView extends ViewPart {
 	private Button copyImageLocationButton;
 	private AutoCompleteField autoCompleteField;
 	private Button addWordButton;
+	private Button removeWordButton;
 
 	private SelectionAdapter getButtonListener(final boolean isBackButton) {
 		return new SelectionAdapter() {
@@ -503,7 +526,9 @@ public class WordView extends ViewPart {
 	private void navigateWord(final boolean isBackButton) {
 		boolean fetchFromRepo = false;
 		if (!isBackButton && !forwardStack.isEmpty()) {
-			backwardStack.push(currentWord);
+			if (currentWord != null) {
+				backwardStack.push(currentWord);
+			}
 			currentWord = forwardStack.pop();
 		} else if (isBackButton) {
             forwardStack.push(currentWord);
@@ -541,14 +566,15 @@ public class WordView extends ViewPart {
 		
 		if (currentWord != null) {
 			wordText.setText(currentWord.getId());
-			definitionText.setText(currentWord.getDefinition());
-			definitionText.setToolTipText(currentWord.getDefinition());
+			String definition = currentWord.getDefinition();
+			definitionText.setText(definition);
+			definitionText.setToolTipText(definition);
 			topComposite.layout(true);
 			image = currentWord.getImage();
 			// update buttons
 			updateWidgetEnablement();
 			updateSpinnerToolTip();
-			canvas.setToolTipText(currentWord.getDefinition());
+			canvas.setToolTipText(definition);
 			recallSpinner.setSelection(currentWord.getLevel());
 		}
 		
@@ -583,11 +609,12 @@ public class WordView extends ViewPart {
 		refreshButton.setEnabled(currentWord != null);
 		copyImageLocationButton.setEnabled(currentWord != null);
 		searchButton.setEnabled(currentWord != null);
+		removeWordButton.setEnabled(currentWord != null && currentWord.isLocal() && forwardStack.isEmpty());
 		updateAddButton();
 	}
 	
 	private void updateAddButton() {
-		addWordButton.setEnabled(!feedProvider.wordExists(searchWordText.getText()));
+		addWordButton.setEnabled(!searchWordText.getText().trim().isEmpty() && !feedProvider.wordExists(searchWordText.getText()));
 	}
 
 	private void updateSpinnerToolTip() {

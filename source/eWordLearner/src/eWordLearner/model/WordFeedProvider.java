@@ -423,6 +423,16 @@ public class WordFeedProvider {
 		return null;
 	}
 	
+	public Word removeAndNavigateWord(Word word) {
+		IWordRepository repository = getRepository(word);
+		repository.removeWord(word);
+		recallLevelMap.remove(word.getId());
+		wordCache.remove(word.getId());
+		lastWord = null; // set to null avoid recall;
+		save();// save the state
+		return getNextWord();
+	}
+	
 	public boolean wordExists(String id) {
 		return wordCache.containsKey(id);
 	}

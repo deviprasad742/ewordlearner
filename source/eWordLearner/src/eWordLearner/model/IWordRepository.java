@@ -35,4 +35,6 @@ public interface IWordRepository {
 
 	File fetchImage(Word word) throws IOException;
 
+	void removeWord(Word word);
+
 }

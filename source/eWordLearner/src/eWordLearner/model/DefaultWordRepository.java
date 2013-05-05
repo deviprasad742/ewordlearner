@@ -283,6 +283,13 @@ public class DefaultWordRepository implements IWordRepository {
 		return true;
 	}
 	
+	@Override
+	public void removeWord(Word word) {
+		String id = word.getId();
+		cachedDefinitions.remove(id);
+		wordsList.remove(id);
+	}
+	
 	private static void removeCommaAtEndofBuffer(StringBuilder buffer) {
 		if (buffer.toString().endsWith(",")) {
 			buffer.deleteCharAt(buffer.length() - 1);
