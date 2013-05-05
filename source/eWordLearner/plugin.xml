@@ -4,6 +4,7 @@
    <extension
          point="org.eclipse.ui.views">
       <view
+            category="org.eclipse.ui"
             class="eWordLearner.ui.WordView"
             icon="icons/view.png"
             id="eWordLearner.ui.WordView"

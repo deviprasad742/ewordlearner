@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/eWordLearnerFeature_1.0.0.qualifier.jar" id="eWordLearnerFeature" version="1.0.0.qualifier">
+      <category name="Utility_Category"/>
+   </feature>
+   <category-def name="Utility_Category" label="Eclipse Utilities"/>
+</site>
