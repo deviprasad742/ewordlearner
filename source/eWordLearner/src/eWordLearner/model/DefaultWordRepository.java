@@ -64,7 +64,7 @@ public class DefaultWordRepository implements IWordRepository {
 
 
 	@Override
-	public Map<String, String> getDefinitions(IProgressMonitor monitor) {
+	public synchronized Map<String, String> getDefinitions(IProgressMonitor monitor) {
 		StringBuffer urlFeedBuffer = new StringBuffer();
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
@@ -156,7 +156,7 @@ public class DefaultWordRepository implements IWordRepository {
 		linkedMap.put(id, value);
 	}
 
-	public Word createWord(String id) {
+	public synchronized Word createWord(String id) {
 		Word word = new Word();
 		word.setId(id);
 		word.setImageUrl(DefaultWordRepository.IMAGE_URL_PREFIX + id + DefaultWordRepository.IMAGE_EXT);
@@ -168,7 +168,7 @@ public class DefaultWordRepository implements IWordRepository {
 		return word;
 	}
 
-	public Word addWord(String id, String definition) {
+	public synchronized Word addWord(String id, String definition) {
 		Word word = new Word();
 		word.setId(id);
 		word.setDefinition(definition);
@@ -195,7 +195,7 @@ public class DefaultWordRepository implements IWordRepository {
 		return imageFile;
 	}
 
-	public void updateModel(Word word) {
+	public synchronized void updateModel(Word word) {
 		cachedDefinitions.put(word.getId(), word.getDefinition());
 	}
 
@@ -284,7 +284,7 @@ public class DefaultWordRepository implements IWordRepository {
 	}
 	
 	@Override
-	public void removeWord(Word word) {
+	public synchronized void removeWord(Word word) {
 		String id = word.getId();
 		cachedDefinitions.remove(id);
 		wordsList.remove(id);

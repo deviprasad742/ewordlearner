@@ -23,6 +23,7 @@ import eWordLearner.eWordLearnerActivator;
 
 public class WordFeedProvider {
 
+	private static final int DEFAULT_POINTER = 1;
 	public static final int DEFAULT_AUTO_SAVE_LENGTH = 20;
 	public static final int REPEAT_DISTANCE = DEFAULT_AUTO_SAVE_LENGTH;
 	private static final String CURRENT_POINTER_KEY = "current_pointer";
@@ -241,7 +242,7 @@ public class WordFeedProvider {
 	}
 	
 	public void reset() {
-		pointer = 0;
+		pointer = DEFAULT_POINTER;
 		lastWord = null;
 		autoSaveCounter = DEFAULT_AUTO_SAVE_LENGTH;
 		unreadWords.clear();
