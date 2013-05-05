@@ -1,0 +1,2 @@
+1. Add preference to configure data location
+2. Add prefernce to configure url 
