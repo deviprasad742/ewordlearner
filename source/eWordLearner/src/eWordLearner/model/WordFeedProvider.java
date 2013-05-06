@@ -410,10 +410,9 @@ public class WordFeedProvider {
 	}
 	
 	public Word addAndNavigateWord(String id) {
-		Collection<IWordRepository> values = repositoryMap.values();
-		if (!values.isEmpty()) {
-			IWordRepository repository = values.iterator().next();
-			Word word = repository.addWord(id, "");
+		IWordRepository defaultRepository = repositoryMap.get(IWordRepository.DEFAULT_USER);
+		if (defaultRepository != null) {
+			Word word = defaultRepository.addWord(id, "");
 			updateProperties(word);
 			unreadWords.add(0, id);
 			wordCache.put(id, word);

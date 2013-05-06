@@ -43,6 +43,7 @@ public class DefaultWordRepository implements IWordRepository {
 	public synchronized void initialize() {
 		isInitialized = false;
 		File definitionsFile = new File(getLocation(), IWordRepository.DEFINITIONS_FILE_NAME);
+		getImagesDirectory();// initialize images folder
 		try {
 			cachedDefinitions.putAll(FileUtils.readMapFromFile(definitionsFile));
 			String wordOrder = cachedDefinitions.get(WORD_ORDER);
@@ -241,9 +242,9 @@ public class DefaultWordRepository implements IWordRepository {
 			repos.delete();
 		}
 		repos.mkdirs();
-		String[] list = repos.list();
-		if (list.length == 0) {
-			File userDir = new File(repos, DEFAULT_USER); 
+
+		File userDir = new File(repos, DEFAULT_USER);
+		if (!userDir.exists()) {
 			userDir.mkdir();
 		}
 		return repos;

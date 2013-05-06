@@ -12,7 +12,7 @@ public interface IWordRepository {
 	String WORD_ORDER = "word_order";
 	String WORD_SEPARATOR = ",";
 	String REPOSITORIES = "repositories";
-	String DEFAULT_USER = "default_user";
+	String DEFAULT_USER = "#default_user";
 
 
 	Map<String, String> getDefinitions(IProgressMonitor monitor);
