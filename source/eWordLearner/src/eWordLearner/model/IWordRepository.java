@@ -37,6 +37,8 @@ public interface IWordRepository {
 
 	void removeWord(Word word);
 
-	File getPreferredImageFile(Word word);
+	File getCustomImageFile(Word word);
+
+	File getImageFile(Word word);
 
 }

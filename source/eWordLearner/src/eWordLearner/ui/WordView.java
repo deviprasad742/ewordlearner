@@ -269,7 +269,7 @@ public class WordView extends ViewPart {
 			}
 
 			private void copyImageLocation() {
-				String imageLocation = feedProvider.getImageLocation(currentWord).getParent();
+				String imageLocation = feedProvider.getUserImagesLocation(currentWord).getParent();
 				Clipboard clipboard = new Clipboard(Display.getDefault());
 				try {
 					clipboard.setContents(new Object[] {imageLocation}, new Transfer[]{TextTransfer.getInstance()});

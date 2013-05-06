@@ -381,9 +381,14 @@ public class WordFeedProvider {
 		return true;
 	}
 
+	public File getUserImagesLocation(final Word word) {
+		IWordRepository repository = getRepository(word);
+		return repository.getCustomImageFile(word);
+	}
+	
 	public File getImageLocation(final Word word) {
 		IWordRepository repository = getRepository(word);
-		return repository.getPreferredImageFile(word);
+		return repository.getImageFile(word);
 	}
 
 	private void updateImage(final Word word, File imageFile) {

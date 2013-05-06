@@ -182,11 +182,11 @@ public class DefaultWordRepository implements IWordRepository {
 	}
 
 	public File fetchImage(Word word) throws IOException {
-		File imageFile = getImageFile(word);
+		File imageFile = getDefaultImageFile(word);
 		if (isWebRepository()) {
-			File preferredFile = getPreferredImageFile(word);// check the override file
-			if (preferredFile.exists()) {
-				return preferredFile;
+			File overrideFile = getCustomImageFile(word);// check the override file
+			if (overrideFile.exists()) {// donot replace override file
+				return overrideFile;
 			} else {
 				FileUtils.writeFile(word.getImageUrl(), imageFile);
 				System.out.println("File copied: " + imageFile);
@@ -195,22 +195,33 @@ public class DefaultWordRepository implements IWordRepository {
 		return imageFile;
 	}
 
-	public File getPreferredImageFile(Word word) {
+	public File getCustomImageFile(Word word) {
 		if (isWebRepository()) {
 			File imagesDirectory = getImagesDirectory();
-			File overrideImagesDir = new File(imagesDirectory, IMAGES_OVERRIDE);
-			overrideImagesDir.mkdir();
-			File overrideImage = new File(overrideImagesDir, getFileName(word));
-			return overrideImage;
+			File customImageDir = new File(imagesDirectory, IMAGES_OVERRIDE);
+			if (!customImageDir.exists()) {
+				customImageDir.mkdir();
+			}
+			File customImage = new File(customImageDir, getFileName(word));
+			return customImage;
 		}
-		return getImageFile(word);
+		// return default image if its not web repository
+		return getDefaultImageFile(word);
 
 	}
 	
-	private File getImageFile(Word word) {
+	public File getDefaultImageFile(Word word) {
 		File imagesDirectory = getImagesDirectory();
 		File imageFile = new File(imagesDirectory, getFileName(word));
 		return imageFile;
+	}
+	
+	public File getImageFile(Word word) {
+		File overrideFile = getCustomImageFile(word);
+		if (overrideFile.exists()) {
+			return overrideFile;
+		}
+		return getDefaultImageFile(word);
 	}
 
 	private String getFileName(Word word) {
