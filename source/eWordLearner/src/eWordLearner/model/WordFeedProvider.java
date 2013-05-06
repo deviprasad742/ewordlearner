@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -247,7 +246,6 @@ public class WordFeedProvider {
 		autoSaveCounter = DEFAULT_AUTO_SAVE_LENGTH;
 		unreadWords.clear();
 		recallIndexMap.clear();
-		recallLevelMap.clear();
 		wordCache.clear();
 		disposeCache();
 		refreshJob.schedule();
