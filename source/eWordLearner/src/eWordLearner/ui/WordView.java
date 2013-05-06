@@ -262,7 +262,7 @@ public class WordView extends ViewPart {
 		
 		copyImageLocationButton = createLeftToolButton(leftBtnComposite);
 		copyImageLocationButton.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_COPY));
-		copyImageLocationButton.setToolTipText("Copy image location to clipboard");
+		copyImageLocationButton.setToolTipText("Copy image location to clipboard. Place <word>.jpg at the copied location and click on refresh to view the updated image");
 		copyImageLocationButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				copyImageLocation();
@@ -499,8 +499,10 @@ public class WordView extends ViewPart {
 		}
 
 		@Override
-		public void imagesLoaded() {
-			updateUIAndImageAsync(true);
+		public void imagesLoaded(Word word) {
+			if (word == currentWord) {
+				updateUIAndImageAsync(true);
+			}
 		}
 	};
 	private Button searchButton;
@@ -568,7 +570,6 @@ public class WordView extends ViewPart {
 			wordText.setText(currentWord.getId());
 			String definition = currentWord.getDefinition();
 			definitionText.setText(definition);
-			definitionText.setToolTipText(definition);
 			topComposite.layout(true);
 			image = currentWord.getImage();
 			// update buttons
@@ -590,8 +591,8 @@ public class WordView extends ViewPart {
 		// set the bounds
 		int x_hint = Math.max(bounds.width, 100);
 		int y_hint = Math.max(bounds.height, 100);
-		x_hint = Math.min(x_hint, 400);
-		y_hint = Math.min(y_hint, 300);
+		x_hint = Math.min(x_hint, 600);
+		y_hint = Math.min(y_hint, 500);
 		GridDataFactory.fillDefaults().grab(true, true).align(SWT.CENTER, SWT.CENTER).hint(x_hint, y_hint).applyTo(canvas);
 		canvas.getParent().layout(true);
 		wordText.getParent().layout(true);
@@ -604,7 +605,6 @@ public class WordView extends ViewPart {
 		nextButton.setEnabled(true);
 		fetchNewButton.setEnabled(feedProvider.hasNewWords());
 		incNextButton.setEnabled(forwardStack.isEmpty());
-		recallSpinner.setEnabled(forwardStack.isEmpty());
 		wordOriginButton.setEnabled(currentWord.getSiteUrl() != null);
 		refreshButton.setEnabled(currentWord != null);
 		copyImageLocationButton.setEnabled(currentWord != null);

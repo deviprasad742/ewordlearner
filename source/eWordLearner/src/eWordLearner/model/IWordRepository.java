@@ -13,6 +13,7 @@ public interface IWordRepository {
 	String WORD_SEPARATOR = ",";
 	String REPOSITORIES = "repositories";
 	String DEFAULT_USER = "#default_user";
+	String IMAGES_OVERRIDE = "images_override";
 
 
 	Map<String, String> getDefinitions(IProgressMonitor monitor);
@@ -31,10 +32,11 @@ public interface IWordRepository {
 
 	void updateModel(Word word);
 
-	File getImageFile(Word word);
 
 	File fetchImage(Word word) throws IOException;
 
 	void removeWord(Word word);
+
+	File getPreferredImageFile(Word word);
 
 }

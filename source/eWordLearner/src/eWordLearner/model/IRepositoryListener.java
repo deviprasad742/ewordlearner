@@ -4,5 +4,5 @@ public interface IRepositoryListener {
 	
 	void repositoryUpdated();
 	
-	void imagesLoaded();
+	void imagesLoaded(Word word);
 }

@@ -24,7 +24,7 @@ public class WordFeedProvider {
 
 	private static final int DEFAULT_POINTER = 1;
 	public static final int DEFAULT_AUTO_SAVE_LENGTH = 20;
-	public static final int REPEAT_DISTANCE = 10;
+	public static final int RECALL_SPACE = 10;
 	private static final String CURRENT_POINTER_KEY = "current_pointer";
 
 	private int pointer = 1;
@@ -197,7 +197,8 @@ public class WordFeedProvider {
 	}
 
 	public String getRecallPosition(Word word) {
-		int nextRepeatPosition = pointer + word.getLevel() * REPEAT_DISTANCE;
+		int multiplier = word.getLevel() * word.getLevel();
+		int nextRepeatPosition = pointer + multiplier * RECALL_SPACE;
 		String nextFreePosition = getNextFreePosition(nextRepeatPosition);
 		return nextFreePosition;
 	}
@@ -346,7 +347,7 @@ public class WordFeedProvider {
 						monitor.subTask(word.getId());
 						updateImage(word, imageFile);
 						if (repositoryListener != null) {
-							repositoryListener.imagesLoaded();
+							repositoryListener.imagesLoaded(word);
 						}
 					}
 				} catch (IOException e) {
@@ -365,7 +366,7 @@ public class WordFeedProvider {
 		}
 		fetchImage(word, true);
 		if (repositoryListener != null) {
-			repositoryListener.imagesLoaded();
+			repositoryListener.imagesLoaded(word);
 		}
 	}
 	
@@ -382,8 +383,7 @@ public class WordFeedProvider {
 
 	public File getImageLocation(final Word word) {
 		IWordRepository repository = getRepository(word);
-		File imageFile = repository.getImageFile(word);
-		return imageFile;
+		return repository.getPreferredImageFile(word);
 	}
 
 	private void updateImage(final Word word, File imageFile) {

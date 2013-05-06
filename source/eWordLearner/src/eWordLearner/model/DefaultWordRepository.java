@@ -184,16 +184,37 @@ public class DefaultWordRepository implements IWordRepository {
 	public File fetchImage(Word word) throws IOException {
 		File imageFile = getImageFile(word);
 		if (isWebRepository()) {
-			FileUtils.writeFile(word.getImageUrl(), imageFile);
-			System.out.println("File copied: " + imageFile);
+			File preferredFile = getPreferredImageFile(word);// check the override file
+			if (preferredFile.exists()) {
+				return preferredFile;
+			} else {
+				FileUtils.writeFile(word.getImageUrl(), imageFile);
+				System.out.println("File copied: " + imageFile);
+			}
 		}
 		return imageFile;
 	}
 
-	public File getImageFile(Word word) {
+	public File getPreferredImageFile(Word word) {
+		if (isWebRepository()) {
+			File imagesDirectory = getImagesDirectory();
+			File overrideImagesDir = new File(imagesDirectory, IMAGES_OVERRIDE);
+			overrideImagesDir.mkdir();
+			File overrideImage = new File(overrideImagesDir, getFileName(word));
+			return overrideImage;
+		}
+		return getImageFile(word);
+
+	}
+	
+	private File getImageFile(Word word) {
 		File imagesDirectory = getImagesDirectory();
-		File imageFile = new File(imagesDirectory, word.getId() + DefaultWordRepository.IMAGE_EXT);
+		File imageFile = new File(imagesDirectory, getFileName(word));
 		return imageFile;
+	}
+
+	private String getFileName(Word word) {
+		return word.getId() + DefaultWordRepository.IMAGE_EXT;
 	}
 
 	public synchronized void updateModel(Word word) {
