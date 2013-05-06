@@ -25,7 +25,7 @@ public class WordFeedProvider {
 
 	private static final int DEFAULT_POINTER = 1;
 	public static final int DEFAULT_AUTO_SAVE_LENGTH = 20;
-	public static final int REPEAT_DISTANCE = DEFAULT_AUTO_SAVE_LENGTH;
+	public static final int REPEAT_DISTANCE = 10;
 	private static final String CURRENT_POINTER_KEY = "current_pointer";
 
 	private int pointer = 1;
