@@ -68,6 +68,7 @@ public class WordFeedProvider {
 
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
+			isLoaded = false;
 			File[] listFiles = deaultRepository.getRepositoryFolder().listFiles();
 			for (File repo : listFiles) {
 				if (repo.isDirectory()) {
@@ -169,16 +170,16 @@ public class WordFeedProvider {
 			if (incrementPointer) { // increment when recalled or skipped and recalled index in free
 				pointer++;
 			}
-		} else {
-			pointer++;
-		}
+		} 
 		
+		boolean isRecallUsed = false;
 		Word nextWord = null;
 		if (pushWord != null)  {
 			nextWord = pushWord; // set the given word as next word
 		} else{
 			String repeatId = recallIndexMap.get(String.valueOf(pointer));
 			if (repeatId != null && !skipRecall) { // check if new word is requested
+				isRecallUsed = true;
 				nextWord = wordCache.get(repeatId);
 			} else if (unreadWords.size() > 0) {
 				String unreadId = unreadWords.get(0);
@@ -193,10 +194,17 @@ public class WordFeedProvider {
 			save();
 		}
 		
-		if (nextWord == null && isLoaded) {
-			if (unreadWords.size() > 0) {
-				unreadWords.remove(0);
-				nextWord = getNextWord(skipRecall, pushWord);
+		if (nextWord == null && isLoaded) {// wait until loaded
+			if (unreadWords.size() > 0) { // try to get next word if current word has no definition
+				if (lastWord == null) {
+					if (isRecallUsed) {
+						recallIndexMap.remove(String.valueOf(pointer));// remove stale entry which has no definition
+						pointer++;
+					} else {
+						unreadWords.remove(0);// remove stale unread entry
+					}
+				}
+				nextWord = getNextWord(false, null);
 			}
 		}
 		
