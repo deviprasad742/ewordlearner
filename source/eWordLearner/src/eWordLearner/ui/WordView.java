@@ -383,7 +383,6 @@ public class WordView extends ViewPart {
 				if (confirm) {
 					currentWord = feedProvider.removeAndNavigateWord(currentWord);
 					updateUIAndImage();
-					updateSearchProposals();
 				}
 			}
 		});
@@ -566,18 +565,22 @@ public class WordView extends ViewPart {
 			return;
 		}
 		
+		String id = "";
+		String definition= "";
 		if (currentWord != null) {
-			wordText.setText(currentWord.getId());
-			String definition = currentWord.getDefinition();
-			definitionText.setText(definition);
+			id = currentWord.getId();
+			definition = currentWord.getDefinition();
 			topComposite.layout(true);
 			image = currentWord.getImage();
 			// update buttons
-			updateWidgetEnablement();
 			updateSpinnerToolTip();
-			canvas.setToolTipText(definition);
 			recallSpinner.setSelection(currentWord.getLevel());
 		}
+		// update fields
+		wordText.setText(id);
+		definitionText.setText(definition);
+		canvas.setToolTipText(definition);
+		updateWidgetEnablement();
 		
 		//clear search text;
 		searchWordText.setText("");
@@ -605,10 +608,11 @@ public class WordView extends ViewPart {
 		nextButton.setEnabled(true);
 		fetchNewButton.setEnabled(feedProvider.hasNewWords());
 		incNextButton.setEnabled(forwardStack.isEmpty());
-		wordOriginButton.setEnabled(currentWord.getSiteUrl() != null);
+		wordOriginButton.setEnabled(currentWord != null && currentWord.getSiteUrl() != null);
 		refreshButton.setEnabled(currentWord != null);
 		copyImageLocationButton.setEnabled(currentWord != null);
 		searchButton.setEnabled(currentWord != null);
+		recallSpinner.setEnabled(currentWord != null);
 		removeWordButton.setEnabled(currentWord != null && currentWord.isLocal() && forwardStack.isEmpty());
 		updateAddButton();
 	}

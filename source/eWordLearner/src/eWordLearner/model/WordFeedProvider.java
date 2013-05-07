@@ -83,9 +83,7 @@ public class WordFeedProvider {
 				boolean isUpdated = syncRepository(monitor, repository);
 				if (isUpdated) {
 					saveRepos = true;
-					if (repositoryListener != null) {
-						repositoryListener.repositoryUpdated();
-					}
+					notifyRepoUpdate();
 				}
 			}
 			
@@ -98,9 +96,11 @@ public class WordFeedProvider {
 			return Status.OK_STATUS;
 		}
 
+
 		private boolean syncRepository(IProgressMonitor monitor, IWordRepository repository) {
 			boolean isUpdated = false;
 			repository.initialize();
+			boolean notify = true; // notify on the load of first word and ignore others
 			Map<String, String> definitions = repository.getDefinitions(monitor);
 			for (Entry<String, String> definiton : definitions.entrySet()) {
 				String wordId = definiton.getKey();
@@ -119,12 +119,22 @@ public class WordFeedProvider {
 					}
 					isUpdated = true;
 				}
-
+				
+				if (notify) {
+					notifyRepoUpdate();
+					notify = false;
+				}
 			}
 			return isUpdated;
 		}
 	};
 
+	private void notifyRepoUpdate() {
+		if (repositoryListener != null) {
+			repositoryListener.repositoryUpdated();
+		}
+	}
+	
 	private void loadModel() throws Exception {
 		unreadWords.addAll(FileUtils.readListFromFile(new File(getLocation(), unreadFileName)));
 		recallLevelMap.putAll(FileUtils.readMapFromFile(new File(getLocation(), levelsFileName)));
@@ -159,6 +169,8 @@ public class WordFeedProvider {
 			if (incrementPointer) { // increment when recalled or skipped and recalled index in free
 				pointer++;
 			}
+		} else {
+			pointer++;
 		}
 		
 		Word nextWord = null;
@@ -421,6 +433,7 @@ public class WordFeedProvider {
 			wordCache.put(id, word);
 			// save if word is Added;
 			save();
+			notifyRepoUpdate();
 			return getNextWord(true, word);
 		}
 		return null;
@@ -431,7 +444,7 @@ public class WordFeedProvider {
 		repository.removeWord(word);
 		recallLevelMap.remove(word.getId());
 		wordCache.remove(word.getId());
-		lastWord = null; // set to null avoid recall;
+		lastWord.setLevel(-1);// avoid recall
 		save();// save the state
 		return getNextWord();
 	}
