@@ -364,7 +364,7 @@ public class WordView extends ViewPart {
 		addWordButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				addWord(searchWordText.getText());
+				addWord(searchWordText.getText().trim());
 			}
 		});
 		
