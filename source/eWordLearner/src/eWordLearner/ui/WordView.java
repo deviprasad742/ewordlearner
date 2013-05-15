@@ -23,10 +23,12 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -187,7 +189,7 @@ public class WordView extends ViewPart {
 		Composite canvasComposite = new Composite(sashContainer, SWT.BORDER);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(canvasComposite);
 		GridLayoutFactory.fillDefaults().applyTo(canvasComposite);
-		sashContainer.setWeights(new int[]{3, 7});
+		sashContainer.setWeights(new int[]{2, 7});
 		
 		createCanvasTitle(canvasComposite);
 		
@@ -198,9 +200,26 @@ public class WordView extends ViewPart {
 		addKeyListeners();
 		
 		
-
+		addPaintListener();
 		updateUIAndImage();
 
+	}
+
+	private void addPaintListener() {
+		canvas.addPaintListener(new PaintListener() {
+			@Override
+			public void paintControl(PaintEvent e) {
+				if (image != null) {
+					GC gc = new GC(canvas);
+					gc.setAntialias(SWT.ON);
+					gc.setInterpolation(SWT.HIGH);
+					gc.drawImage(image, 0, 0, 
+							image.getBounds().width, image.getBounds().height, 
+							0, 0, 350, 350);
+					gc.dispose();
+				}
+			}
+		});
 	}
 
 	private void addKeyListeners() {
@@ -513,6 +532,7 @@ public class WordView extends ViewPart {
 	private AutoCompleteField autoCompleteField;
 	private Button addWordButton;
 	private Button removeWordButton;
+	private Image image;
 
 	private SelectionAdapter getButtonListener(final boolean isBackButton) {
 		return new SelectionAdapter() {
@@ -560,7 +580,7 @@ public class WordView extends ViewPart {
 	}
 	
 	private void updateUIAndImage() {
-		Image image = null;
+		image = null;
 		if (canvas.isDisposed()) {
 			return;
 		}
@@ -578,7 +598,10 @@ public class WordView extends ViewPart {
 		}
 		// update fields
 		wordText.setText(id);
-		definitionText.setText(definition);
+		String progressText = "Words covered: " + feedProvider.getCompletedWords() +  " of " + feedProvider.getTotalWords();
+		wordText.setToolTipText(progressText);
+		
+ 		definitionText.setText(definition);
 		canvas.setToolTipText(definition);
 		updateWidgetEnablement();
 		
@@ -588,15 +611,9 @@ public class WordView extends ViewPart {
 		if (image == null) {
 			image = WordRepoConstants.IMAGE_NOT_AVAILABLE; // show dummy image
 		}
-		canvas.setBackgroundImage(image);
-		canvas.update();
-		Rectangle bounds = image.getBounds();
-		// set the bounds
-		int x_hint = Math.max(bounds.width, 100);
-		int y_hint = Math.max(bounds.height, 100);
-		x_hint = Math.min(x_hint, 600);
-		y_hint = Math.min(y_hint, 500);
-		GridDataFactory.fillDefaults().grab(true, true).align(SWT.CENTER, SWT.CENTER).hint(x_hint, y_hint).applyTo(canvas);
+		
+		GridDataFactory.fillDefaults().grab(true, true).align(SWT.CENTER, SWT.CENTER).hint(350, 350).applyTo(canvas);
+		canvas.redraw();
 		canvas.getParent().layout(true);
 		wordText.getParent().layout(true);
 		

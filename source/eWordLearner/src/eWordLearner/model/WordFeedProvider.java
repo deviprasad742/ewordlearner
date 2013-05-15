@@ -432,6 +432,15 @@ public class WordFeedProvider {
 		return null;
 	}
 	
+	public int getCompletedWords() {
+		return wordCache.size() - unreadWords.size();
+	}
+	
+	public int getTotalWords() {
+		return wordCache.size();
+	}
+	
+	
 	public Word addAndNavigateWord(String id) {
 		IWordRepository defaultRepository = repositoryMap.get(IWordRepository.DEFAULT_USER);
 		if (defaultRepository != null) {
