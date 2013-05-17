@@ -1,5 +1,7 @@
 package eWordLearner.ui;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Stack;
@@ -44,7 +46,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import eWordLearner.WordRepoConstants;
+import eWordLearner.eWordLearnerActivator;
 import eWordLearner.model.IRepositoryListener;
+import eWordLearner.model.MP3File;
 import eWordLearner.model.Word;
 import eWordLearner.model.WordFeedProvider;
 import eWordLearner.model.WordPreferences;
@@ -268,14 +272,35 @@ public class WordView extends ViewPart {
 		GridDataFactory.swtDefaults().align(SWT.RIGHT, SWT.CENTER).grab(true, false).applyTo(rightBtnComposite);
 		GridLayoutFactory.fillDefaults().numColumns(5).applyTo(rightBtnComposite);
 		
-		
 		Composite wordComposite = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(wordComposite);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(wordComposite);
+		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).applyTo(wordComposite);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(wordComposite);
 		
 		wordText = new Text(wordComposite, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).applyTo(wordText);
+		GridDataFactory.swtDefaults().applyTo(wordText);
 		wordText.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DEFAULT_FONT));
+		
+		playWordButton = new Button(wordComposite, SWT.FLAT);
+		GridDataFactory.swtDefaults().applyTo(wordText);
+		playWordButton.setImage(WordRepoConstants.IMAGE_SOUND);
+		playWordButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				playWord();
+			}
+
+			private void playWord() {
+				try {
+					feedProvider.fetchSoundFile(currentWord);
+					String soundFile = currentWord.getSoundFile();
+					if (new File(soundFile).exists()) {
+						new MP3File(soundFile).play();
+					}
+				} catch (IOException e) {
+					eWordLearnerActivator.getDefault().logAndShowException(e);
+				}
+			}
+		});
 		
 		/*********************************** Left Toolbar Section *****************************************************/
 		
@@ -401,6 +426,7 @@ public class WordView extends ViewPart {
 				boolean confirm = MessageDialog.openConfirm(getSite().getShell(), "Confirm", message);
 				if (confirm) {
 					currentWord = feedProvider.removeAndNavigateWord(currentWord);
+					updateSearchProposals();
 					updateUIAndImage();
 				}
 			}
@@ -533,6 +559,7 @@ public class WordView extends ViewPart {
 	private Button addWordButton;
 	private Button removeWordButton;
 	private Image image;
+	private Button playWordButton;
 
 	private SelectionAdapter getButtonListener(final boolean isBackButton) {
 		return new SelectionAdapter() {
@@ -631,6 +658,7 @@ public class WordView extends ViewPart {
 		searchButton.setEnabled(currentWord != null);
 		recallSpinner.setEnabled(currentWord != null);
 		removeWordButton.setEnabled(currentWord != null && currentWord.isLocal() && forwardStack.isEmpty());
+		playWordButton.setEnabled(currentWord != null);
 		updateAddButton();
 	}
 	

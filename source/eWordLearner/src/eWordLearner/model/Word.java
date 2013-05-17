@@ -19,6 +19,7 @@ public class Word {
 	private Image image;
 	private int level;
 	private String repository;
+	private String soundFile;
 	
 	public String getId() {
 		return id;
@@ -79,6 +80,14 @@ public class Word {
 		this.repository = repository;
 	}
 
+	public String getSoundFile() {
+		return soundFile;
+	}
+	
+	public void setSoundFile(String soundFile) {
+		this.soundFile = soundFile;
+	}
+	
 	@Override
 	public String toString() {
 		return "Word [id=" + id + ", imageUrl=" + imageUrl + ", definition=" + definition + ", siteUrl=" + siteUrl + ", level=" + level + "]";
@@ -87,6 +96,5 @@ public class Word {
 	public boolean isLocal() {
 		return getSiteUrl() == null;
 	}
-
 	
 }

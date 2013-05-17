@@ -26,23 +26,25 @@ public class FileUtils {
 			URL url = new URL(urlStr);
 			connection = (HttpURLConnection) url.openConnection();
 			connection.connect();
-			InputStream in = connection.getInputStream();
-			FileOutputStream out = new FileOutputStream(file);
-			try {
-				byte[] chunk = new byte[1024];
-				int readCount;
-				while ((readCount = in.read(chunk)) != -1) {
-					out.write(chunk, 0, readCount);
-				}
-			} finally {
-				if (in != null) {
-					in.close();
-				}
-				if (out != null) {
-					out.close();
+			if (connection.getResponseCode() != 404) {
+				InputStream in = connection.getInputStream();
+				FileOutputStream out = new FileOutputStream(file);
+				try {
+					byte[] chunk = new byte[1024];
+					int readCount;
+					while ((readCount = in.read(chunk)) != -1) {
+						out.write(chunk, 0, readCount);
+					}
+				} finally {
+					if (in != null) {
+						in.close();
+					}
+					if (out != null) {
+						out.close();
+					}
 				}
 			}
-		}  finally {
+		} finally {
 			connection.disconnect();
 		}
 	}

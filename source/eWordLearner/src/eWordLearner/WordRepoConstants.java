@@ -24,6 +24,7 @@ public class WordRepoConstants {
 	public static final Image IMAGE_NOT_AVAILABLE = createImage("icons/noimage.jpg");
 	public static final Image IMAGE_REFRESH = createImage("icons/refresh.gif");
 	public static final Image IMAGE_SEARCH = createImage("icons/search.png");
+	public static final Image IMAGE_SOUND = createImage("icons/sound.png");
 
 
 	static {

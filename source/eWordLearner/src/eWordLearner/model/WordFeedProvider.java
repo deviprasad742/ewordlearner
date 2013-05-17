@@ -390,6 +390,11 @@ public class WordFeedProvider {
 		}
 	}
 	
+	public void fetchSoundFile(Word word) throws IOException {
+		IWordRepository repository = getRepository(word);
+		repository.fetchSound(word);
+	}
+	
 	private boolean fetchImage(final Word word, final boolean download) {
 		File imageFile = getImageLocation(word);
 		if (!imageFile.exists() && download) {

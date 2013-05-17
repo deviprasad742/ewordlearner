@@ -25,6 +25,8 @@ import eWordLearner.eWordLearnerActivator;
 
 public class DefaultWordRepository implements IWordRepository {
 
+	public static final String GOOGLE_SOUND_URL = "http://www.gstatic.com/dictionary/static/sounds/de/0/";
+	public static final String MP3_EXTENSION = ".mp3";
 	public static final String BASE_URL = "http://www.phocabulary.com/feed.php";
 	public static final String IMAGE_URL_PREFIX = "http://www.phocabulary.com/words/";
 	public static final String WORD_URL_PREFIX = "http://www.phocabulary.com/";
@@ -194,6 +196,19 @@ public class DefaultWordRepository implements IWordRepository {
 		}
 		return imageFile;
 	}
+	
+	
+	public void fetchSound(Word word) throws IOException {
+		if (word.getSoundFile() == null) {
+			String fileName = word.getId() + MP3_EXTENSION;
+			File soundFile = new File(getSoundsDirectory(), fileName);
+			word.setSoundFile(soundFile.getAbsolutePath());
+			if (!soundFile.exists()) {
+				String sourceUrl = GOOGLE_SOUND_URL + fileName;
+				FileUtils.writeFile(sourceUrl, soundFile);
+			}
+		}
+	}
 
 	public File getCustomImageFile(Word word) {
 		if (isWebRepository()) {
@@ -291,6 +306,16 @@ public class DefaultWordRepository implements IWordRepository {
 		}
 		return imagesDir;
 	}
+	
+	private File soundsDir;
+
+	private File getSoundsDirectory() {
+		if (soundsDir == null) {
+			soundsDir = new File(getLocation(), "sounds");
+			soundsDir.mkdirs();
+		}
+		return soundsDir;
+	}
 
 	private boolean isInternetConnected() {
 		try {
@@ -321,6 +346,10 @@ public class DefaultWordRepository implements IWordRepository {
 		String id = word.getId();
 		cachedDefinitions.remove(id);
 		wordsList.remove(id);
+		String soundFile = word.getSoundFile();
+		if (soundFile != null) {
+			new File(soundFile).delete();
+		}
 	}
 	
 	private static void removeCommaAtEndofBuffer(StringBuilder buffer) {

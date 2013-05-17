@@ -41,4 +41,6 @@ public interface IWordRepository {
 
 	File getImageFile(Word word);
 
+	void fetchSound(Word word) throws IOException;
+
 }
