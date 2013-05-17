@@ -254,6 +254,8 @@ public class WordView extends ViewPart {
 					navigateWord(false);
 				} else if (e.keyCode == SWT.ARROW_UP || e.keyCode == SWT.ARROW_DOWN) {
 					fetchNewWord();
+				} else if (e.keyCode == '\r') {
+					playWord();
 				}
 			}
 		});
@@ -288,19 +290,8 @@ public class WordView extends ViewPart {
 			public void widgetSelected(SelectionEvent e) {
 				playWord();
 			}
-
-			private void playWord() {
-				try {
-					feedProvider.fetchSoundFile(currentWord);
-					String soundFile = currentWord.getSoundFile();
-					if (new File(soundFile).exists()) {
-						new MP3File(soundFile).play();
-					}
-				} catch (IOException e) {
-					eWordLearnerActivator.getDefault().logAndShowException(e);
-				}
-			}
 		});
+		playWordButton.setToolTipText("Pronounce Word (Key Enter)");
 		
 		/*********************************** Left Toolbar Section *****************************************************/
 		
@@ -516,6 +507,20 @@ public class WordView extends ViewPart {
 		}
 	}
 
+	private void playWord() {
+		if (currentWord != null) {
+			try {
+				feedProvider.fetchSoundFile(currentWord);
+				String soundFile = currentWord.getSoundFile();
+				if (new File(soundFile).exists()) {
+					new MP3File(soundFile).play();
+				}
+			} catch (IOException e) {
+				eWordLearnerActivator.getDefault().logAndShowException(e);
+			}
+		}
+	}
+	
 	private void fetchNewWord() {
 		currentWord = feedProvider.getNextWord(true);
 		updateUIAndImage();

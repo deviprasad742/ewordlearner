@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/eWordLearnerFeature_1.0.0.201305180035.jar" id="eWordLearnerFeature" version="1.0.0.201305180035">
+   <feature url="features/eWordLearnerFeature_1.0.0.201305180045.jar" id="eWordLearnerFeature" version="1.0.0.201305180045">
       <category name="Eclipse_Utility"/>
    </feature>
    <category-def name="Eclipse_Utility" label="Eclipse Utilities"/>
