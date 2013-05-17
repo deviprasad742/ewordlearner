@@ -12,6 +12,7 @@ import org.eclipse.ui.PlatformUI;
 
 public class WordRepoConstants {
 
+	
 	private static final List<Image> createdImages = new ArrayList<Image>();
 	public static final Image IMAGE_FOLDER = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
 	public static final Image IMAGE_FILE = createImage("icons/file.jpg");
@@ -25,7 +26,7 @@ public class WordRepoConstants {
 	public static final Image IMAGE_REFRESH = createImage("icons/refresh.gif");
 	public static final Image IMAGE_SEARCH = createImage("icons/search.png");
 	public static final Image IMAGE_SOUND = createImage("icons/sound.png");
-
+    public static final String PREF_PRONOUNCE_WORD = "pronounce_word";
 
 	static {
 

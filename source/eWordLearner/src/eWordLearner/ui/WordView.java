@@ -12,6 +12,7 @@ import org.eclipse.jface.fieldassist.AutoCompleteField;
 import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -88,7 +89,7 @@ public class WordView extends ViewPart {
 
 		Composite btnComposite = new Composite(topComposite, SWT.NONE);
 		GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.CENTER).grab(true, false).applyTo(btnComposite);
-		GridLayoutFactory.fillDefaults().numColumns(6).applyTo(btnComposite);
+		GridLayoutFactory.fillDefaults().numColumns(7).applyTo(btnComposite);
 		
 		/*Button addButton = new Button(btnComposite, SWT.PUSH);
 		addButton.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ADD));
@@ -172,6 +173,23 @@ public class WordView extends ViewPart {
 		});
 		incNextButton.addSelectionListener(getButtonListener(false));
         incNextButton.setEnabled(false);
+        
+        pronounceAlwaysButton = new Button(btnComposite, SWT.CHECK);
+        pronounceAlwaysButton.setImage(WordRepoConstants.IMAGE_SOUND);
+        pronounceAlwaysButton.setToolTipText("Pronounce word while navigating between words");
+		GridDataFactory.swtDefaults().applyTo(pronounceAlwaysButton);
+
+		final IPreferenceStore preferenceStore = eWordLearnerActivator.getDefault().getPreferenceStore();
+		preferenceStore.setDefault(WordRepoConstants.PREF_PRONOUNCE_WORD, true);
+		pronounceAlwaysButton.setSelection(preferenceStore.getBoolean(WordRepoConstants.PREF_PRONOUNCE_WORD));
+		pronounceAlwaysButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				preferenceStore
+						.setValue(WordRepoConstants.PREF_PRONOUNCE_WORD, pronounceAlwaysButton.getSelection());
+			}
+		});
+		
 		
 		SashForm sashContainer = new SashForm(container, SWT.VERTICAL);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(sashContainer);
@@ -283,7 +301,7 @@ public class WordView extends ViewPart {
 		wordText.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DEFAULT_FONT));
 		
 		playWordButton = new Button(wordComposite, SWT.FLAT);
-		GridDataFactory.swtDefaults().applyTo(wordText);
+		GridDataFactory.swtDefaults().applyTo(playWordButton);
 		playWordButton.setImage(WordRepoConstants.IMAGE_SOUND);
 		playWordButton.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -565,6 +583,7 @@ public class WordView extends ViewPart {
 	private Button removeWordButton;
 	private Image image;
 	private Button playWordButton;
+	private Button pronounceAlwaysButton;
 
 	private SelectionAdapter getButtonListener(final boolean isBackButton) {
 		return new SelectionAdapter() {
@@ -594,8 +613,10 @@ public class WordView extends ViewPart {
 		if (fetchFromRepo) {
 			currentWord = feedProvider.getNextWord();
 		}
-		
 		updateUIAndImage();
+		if (pronounceAlwaysButton.getSelection()) {
+			playWord();
+		}
 	}
 	
 	private void updateUIAndImageAsync(final boolean isImageUpdate) {
