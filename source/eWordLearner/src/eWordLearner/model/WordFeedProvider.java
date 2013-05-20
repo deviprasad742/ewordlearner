@@ -395,6 +395,11 @@ public class WordFeedProvider {
 		repository.fetchSound(word);
 	}
 	
+	public void setImage(Word word, String url) throws IOException {
+		IWordRepository repository = getRepository(word);
+		repository.downloadImage(word, url);
+	}
+	
 	private boolean fetchImage(final Word word, final boolean download) {
 		File imageFile = getImageLocation(word);
 		if (!imageFile.exists() && download) {

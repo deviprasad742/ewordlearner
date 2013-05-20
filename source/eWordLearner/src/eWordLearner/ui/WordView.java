@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Stack;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -18,7 +19,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -49,6 +49,7 @@ import org.eclipse.ui.part.ViewPart;
 import eWordLearner.WordRepoConstants;
 import eWordLearner.eWordLearnerActivator;
 import eWordLearner.model.IRepositoryListener;
+import eWordLearner.model.IWordRepository;
 import eWordLearner.model.MP3File;
 import eWordLearner.model.Word;
 import eWordLearner.model.WordFeedProvider;
@@ -313,19 +314,40 @@ public class WordView extends ViewPart {
 		
 		/*********************************** Left Toolbar Section *****************************************************/
 		
-		copyImageLocationButton = createLeftToolButton(leftBtnComposite);
-		copyImageLocationButton.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_COPY));
-		copyImageLocationButton.setToolTipText("Copy image location to clipboard. Place <word>.jpg at the copied location and click on refresh to view the updated image");
-		copyImageLocationButton.addSelectionListener(new SelectionAdapter() {
+		copyImageButton = createLeftToolButton(leftBtnComposite);
+		copyImageButton.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_COPY));
+		copyImageButton.setToolTipText("Copy the image url from the web and click on the button to update the image.");
+		copyImageButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				copyImageLocation();
+				downloadImage();
 			}
 
-			private void copyImageLocation() {
-				String imageLocation = feedProvider.getUserImagesLocation(currentWord).getParent();
+			private void downloadImage() {
 				Clipboard clipboard = new Clipboard(Display.getDefault());
 				try {
-					clipboard.setContents(new Object[] {imageLocation}, new Transfer[]{TextTransfer.getInstance()});
+					Object contents = clipboard.getContents(TextTransfer.getInstance());
+					boolean isValid = false;
+					if (contents != null) {
+						String url = contents.toString();
+						Matcher matcher = IWordRepository.IMAGE_URL_PATTERN.matcher(url);
+						if (matcher.matches()) {
+							isValid = true;
+							try {
+								boolean proceed = currentWord.getImage() == null;
+								proceed = proceed || MessageDialog.openQuestion(getSite().getShell(), "Confirm", "Are you sure you want to replace the existing image?");
+								if (proceed) {
+									feedProvider.setImage(currentWord, url);
+									refreshImage();
+								}
+							} catch (IOException e) {
+								eWordLearnerActivator.getDefault().logAndShowException(e);
+							}
+						} 
+					}
+					if (!isValid) {
+						String message = "Clipboard doesn't contain a valid image url. Copy the image url from web (ending with jpeg,jpg,png,bmp,gif) and select the button again to update the image.";
+						MessageDialog.openInformation(getSite().getShell(), "Information", message);
+					}
 				} finally {
 					clipboard.dispose();
 				}
@@ -339,10 +361,6 @@ public class WordView extends ViewPart {
 		refreshButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				refreshImage();
-			}
-
-			private void refreshImage() {
-				feedProvider.refreshImage(currentWord);
 			}
 		});
 		
@@ -480,6 +498,10 @@ public class WordView extends ViewPart {
 			}
 		});
 	}
+	
+	private void refreshImage() {
+		feedProvider.refreshImage(currentWord);
+	}
 
 	private void updateSearchProposals() {
 		List<String> proposals = feedProvider.getAvailableWords();
@@ -577,7 +599,7 @@ public class WordView extends ViewPart {
 	private Button wordOriginButton;
 	private Button fetchNewButton;
 	private Button refreshButton;
-	private Button copyImageLocationButton;
+	private Button copyImageButton;
 	private AutoCompleteField autoCompleteField;
 	private Button addWordButton;
 	private Button removeWordButton;
@@ -680,7 +702,7 @@ public class WordView extends ViewPart {
 		incNextButton.setEnabled(forwardStack.isEmpty());
 		wordOriginButton.setEnabled(currentWord != null && currentWord.getSiteUrl() != null);
 		refreshButton.setEnabled(currentWord != null);
-		copyImageLocationButton.setEnabled(currentWord != null);
+		copyImageButton.setEnabled(currentWord != null);
 		searchButton.setEnabled(currentWord != null);
 		recallSpinner.setEnabled(currentWord != null);
 		removeWordButton.setEnabled(currentWord != null && currentWord.isLocal() && forwardStack.isEmpty());

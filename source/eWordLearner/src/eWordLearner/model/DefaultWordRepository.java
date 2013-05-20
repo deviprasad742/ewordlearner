@@ -350,6 +350,14 @@ public class DefaultWordRepository implements IWordRepository {
 		if (soundFile != null) {
 			new File(soundFile).delete();
 		}
+		File imageFile = getCustomImageFile(word);
+		imageFile.delete();
+	}
+	
+	@Override
+	public void downloadImage(Word word, String url) throws IOException {
+		File imageFile = getCustomImageFile(word);
+		FileUtils.writeFile(url, imageFile);
 	}
 	
 	private static void removeCommaAtEndofBuffer(StringBuilder buffer) {
