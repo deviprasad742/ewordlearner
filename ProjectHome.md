@@ -1,0 +1,1 @@
+An eclipse plugin which helps in learning new words quickly using images as aid for word recall
